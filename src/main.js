@@ -1,5 +1,5 @@
 import { Report } from 'notiflix/build/notiflix-report-aio';
-const axios = require('axios/dist/node/axios.cjs');
+import axios from "axios";
 
 
 const form = document.querySelector('.js-form')
