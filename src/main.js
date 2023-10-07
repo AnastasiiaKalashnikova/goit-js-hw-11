@@ -131,17 +131,3 @@ function clearGallery() {
 
 
 
-
-
-//______________________________________________________
-//  СМІТТЯ
-//function getImages() {
-//    return fetch(`${URL}?${seachParams}&q=cat`)
-//    .then(response => {
- //       if (!response.ok) {
-//            console.log(response)
-//            throw new Error(response.status);
-//        }
-//        return response.json();
-//    })
-//}
