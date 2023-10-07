@@ -1,1 +1,0 @@
-{"mappings":"ACAA","sources":["index.6b6bef04.css","src/styles.css"],"sourcesContent":[".form-wrapper {\n  height: 80px;\n  background-color: rgba(0, 119, 255, .827);\n}\n\n/*# sourceMappingURL=index.6b6bef04.css.map */\n",".form-wrapper{\n    background-color: rgba(0, 119, 255, 0.827);\n    height: 80px;\n}"],"names":[],"version":3,"file":"index.6b6bef04.css.map"}
