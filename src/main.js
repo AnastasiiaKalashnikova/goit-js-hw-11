@@ -1,5 +1,10 @@
 import axios from "axios";
 import Notiflix from 'notiflix';
+import simpleLightbox from "simplelightbox";
+// Описаний в документації
+import SimpleLightbox from "simplelightbox";
+// Додатковий імпорт стилів
+import "simplelightbox/dist/simple-lightbox.min.css";
 
 const URL = 'https://pixabay.com/api/'
 const API_KEY = '39890797-00190d6beecffd2ffd1001b1e'
@@ -13,7 +18,6 @@ const seachParams = new URLSearchParams({
 let currentPage;
 let inputValue = ''
 
-
 const form = document.querySelector('.js-form')
 const gallery = document.querySelector('.js-gallery')
 const loader = document.querySelector('.js-load-btn')
@@ -25,7 +29,7 @@ form.addEventListener('submit', forSearch)
 
 
 function forSearch(evt) {
-    cleanGallery();
+    clearGallery();
     currentPage = 1;
     evt.preventDefault();
     //забрали значення інпута console.log(searchText)
@@ -47,9 +51,10 @@ function forSearch(evt) {
                 return
             }
 
-        gallery.insertAdjacentHTML('beforeend', createMarkup(response.data.hits))
-        Notiflix.Notify.success(`Hooray! We found ${response.data.totalHits} images.`)   
-        loader.hidden = false    
+            gallery.insertAdjacentHTML('beforeend', createMarkup(response.data.hits))
+            Notiflix.Notify.success(`Hooray! We found ${response.data.totalHits} images.`)   
+            loader.hidden = false;
+            let lightbox = new SimpleLightbox('.gallery a');
                  if ((response.data.totalHits / 40) < 1) {
                 loader.hidden = true
                 return
@@ -66,7 +71,6 @@ function forSearch(evt) {
 
 async function getImages(text, page=1) {
     const response = await axios.get(`${URL}?${seachParams}&q=${text}&page=${page}`)
-    console.log(response)
     if (response.statusText !== 'OK') {
         throw new Error
     }
@@ -76,8 +80,11 @@ async function getImages(text, page=1) {
 
 //функція створення розмітки ПРАЦЮЄ
 function createMarkup(arr) {
-     const markup = arr.map(({ webformatURL, largeImageURL, tags, likes, views, comments, downloads }) => `<div class="photo-card">
+    const markup = arr.map(({ webformatURL, largeImageURL, tags, likes, views, comments, downloads }) =>
+     `<div class="photo-card">
+     <a class="gallery__link" href="${largeImageURL}">
   <img src="${webformatURL}" alt="${tags}" loading="lazy" class="img"/>
+  </a>
   <div class="info">
     <p class="info-item">
       <b>Likes</b> <br> ${likes}
@@ -105,7 +112,7 @@ function forLoadMore(evt) {
     currentPage += 1;
     getImages(inputValue, currentPage)
         .then(function (response) {
-            gallery.insertAdjacentHTML('beforeend', createMarkup(response.data.hits))
+            gallery.insertAdjacentHTML('beforeend', createMarkup(response.data.hits));
             if (currentPage > Math.floor(response.data.totalHits / 40)) {
                 loader.hidden = true
                 Notiflix.Notify.info('We are sorry but you have reached the end of search results.')
@@ -118,7 +125,7 @@ function forLoadMore(evt) {
 }
 
 //очистити для нового запиту
-function cleanGallery() {
+function clearGallery() {
     gallery.innerHTML =""
 }
 
