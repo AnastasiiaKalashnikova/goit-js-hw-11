@@ -10,13 +10,12 @@ const seachParams = new URLSearchParams({
     safesearch: 'true',
     per_page: 40
 })
-let currentPage = 1;
+let currentPage;
 let inputValue = ''
 
 
 const form = document.querySelector('.js-form')
 const gallery = document.querySelector('.js-gallery')
-const btn = document.querySelector('.js-btn')
 const loader = document.querySelector('.js-load-btn')
 
 
@@ -26,7 +25,9 @@ form.addEventListener('submit', forSearch)
 
 
 function forSearch(evt) {
-    evt.preventDefault()
+    cleanGallery();
+    currentPage = 1;
+    evt.preventDefault();
     //забрали значення інпута console.log(searchText)
     const searchText = evt.currentTarget.elements.searchQuery.value.trim()
     inputValue = searchText
@@ -39,8 +40,9 @@ function forSearch(evt) {
 
     getImages(searchText, currentPage)
         .then(function (response) {
+            //якщо картинок немає
             if (response.data.totalHits === 0) {
-                //якщо картинок немає
+                loader.hidden = true
                 Notiflix.Notify.failure('Sorry, there are no images matching your search query. Please try again.')
                 return
             }
@@ -56,15 +58,19 @@ function forSearch(evt) {
   })
         .catch(function (error) {
       Notiflix.Notify.failure('Something went wrong. Please try again.')
-    console.log(error);
+            console.log(error.response.statusText);
         })
-    .finally(evt.currentTarget.reset())
+    evt.currentTarget.reset()
 }
 
 
-async function getImages(text, page) {
+async function getImages(text, page=1) {
     const response = await axios.get(`${URL}?${seachParams}&q=${text}&page=${page}`)
-return response
+    console.log(response)
+    if (response.statusText !== 'OK') {
+        throw new Error
+    }
+    return response
 }
 
 
@@ -74,16 +80,16 @@ function createMarkup(arr) {
   <img src="${webformatURL}" alt="${tags}" loading="lazy" class="img"/>
   <div class="info">
     <p class="info-item">
-      <b>Likes</b>
+      <b>Likes</b> <br> ${likes}
     </p>
     <p class="info-item">
-      <b>Views</b>
+      <b>Views</b> <br> ${views}
     </p>
     <p class="info-item">
-      <b>Comments</b>
+      <b>Comments</b> <br> ${comments}
     </p>
     <p class="info-item">
-      <b>Downloads</b>
+      <b>Downloads</b> <br> ${downloads}
     </p>
   </div>
 </div>`).join('')
@@ -111,7 +117,10 @@ function forLoadMore(evt) {
   })
 }
 
-
+//очистити для нового запиту
+function cleanGallery() {
+    gallery.innerHTML =""
+}
 
 
 
