@@ -29,8 +29,7 @@ form.addEventListener('submit', forSearch)
 
 
 function forSearch(evt) {
-  clearGallery();
-  loader.hidden = true;
+    clearGallery();
     currentPage = 1;
     evt.preventDefault();
     //забрали значення інпута console.log(searchText)
@@ -41,37 +40,42 @@ function forSearch(evt) {
         Notiflix.Notify.failure('Please fiil the field.')
         return
     }   
+    
+
     getImages(searchText, currentPage)
+        .then(function (response) {
+            //якщо картинок немає
+            if (response.data.totalHits === 0) {
+                loader.hidden = true
+                Notiflix.Notify.failure('Sorry, there are no images matching your search query. Please try again.')
+                return
+            }
+
+            gallery.insertAdjacentHTML('beforeend', createMarkup(response.data.hits))
+            Notiflix.Notify.success(`Hooray! We found ${response.data.totalHits} images.`)   
+            loader.hidden = false;
+            let lightbox = new SimpleLightbox('.gallery a');
+                 if ((response.data.totalHits / 40) < 1) {
+                loader.hidden = true
+                return
+            } 
+            
+  })
+        .catch(function (error) {
+      Notiflix.Notify.failure('Something went wrong. Please try again.')
+            console.log(error.response.statusText);
+        })
     evt.currentTarget.reset()
 }
 
 
-async function getImages(text, page = 1) {
-  try {const response = await axios.get(`${URL}?${seachParams}&q=${text}&page=${page}`)
+async function getImages(text, page=1) {
+    const response = await axios.get(`${URL}?${seachParams}&q=${text}&page=${page}`)
     if (response.statusText !== 'OK') {
-        throw new Error(response)
+        throw new Error
     }
-    //якщо картинок немає
-    if (response.data.totalHits === 0) {
-        loader.hidden = true
-        Notiflix.Notify.failure('Sorry, there are no images matching your search query. Please try again.')
-        return
-    }
-
-    gallery.insertAdjacentHTML('beforeend', createMarkup(response.data.hits))
-    Notiflix.Notify.success(`Hooray! We found ${response.data.totalHits} images.`)   
-    loader.hidden = false;
-    let lightbox = new SimpleLightbox('.gallery a');
-         if ((response.data.totalHits / 40) < 1) {
-        loader.hidden = true
-        return
-    } 
-  }
-  catch (error) {
-    Notiflix.Notify.failure('Something went wrong. Please try again.')
-          console.log(error.code)
-            return;
-  }
+  
+    return response
 }
 
 
@@ -107,33 +111,21 @@ loader.addEventListener('click', forLoadMore)
 //для отримання наступної групи картинок
 function forLoadMore(evt) {
     currentPage += 1;
-    getNextImages(inputValue, currentPage)
-}
-
-async function getNextImages(text, page) {
-  try {
-    const response = await axios.get(`${URL}?${seachParams}&q=${text}&page=${page}`)
-    if (response.statusText !== 'OK') {
-      throw new Error(response)
-    }
-    gallery.insertAdjacentHTML('beforeend', createMarkup(response.data.hits));
+    getImages(inputValue, currentPage)
+        .then(function (response) {
+            gallery.insertAdjacentHTML('beforeend', createMarkup(response.data.hits));
             if (currentPage > Math.floor(response.data.totalHits / 40)) {
                 loader.hidden = true
                 Notiflix.Notify.info('We are sorry but you have reached the end of search results.')
                 return
             }
-
-  } catch (error) {
-    Notiflix.Notify.failure('Sorry, there are no images matching your search query. Please try again.')
+  })
+        .catch(function (error) {
     console.log(error);
-  }
+  })
 }
-
 
 //очистити для нового запиту
 function clearGallery() {
     gallery.innerHTML =""
 }
-
-
-
