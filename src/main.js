@@ -48,7 +48,7 @@ function forSearch(evt) {
 
 async function getImages(text, page = 1) {
   try {const response = await axios.get(`${URL}?${seachParams}&q=${text}&page=${page}`)
-    if (response.statusText !== 'OK') {
+    if (response.status !== 200) {
         throw new Error(response)
     }
     //якщо картинок немає
@@ -69,7 +69,7 @@ async function getImages(text, page = 1) {
   }
   catch (error) {
     Notiflix.Notify.failure('Something went wrong. Please try again.')
-          console.log(error.code)
+          console.log(error)
             return;
   }
 }
@@ -113,7 +113,7 @@ function forLoadMore(evt) {
 async function getNextImages(text, page) {
   try {
     const response = await axios.get(`${URL}?${seachParams}&q=${text}&page=${page}`)
-    if (response.statusText !== 'OK') {
+    if (response.status !== 200) {
       throw new Error(response)
     }
     gallery.insertAdjacentHTML('beforeend', createMarkup(response.data.hits));
