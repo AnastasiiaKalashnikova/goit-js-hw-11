@@ -1,9 +1,6 @@
 import axios from "axios";
 import Notiflix from 'notiflix';
-import simpleLightbox from "simplelightbox";
-// Описаний в документації
 import SimpleLightbox from "simplelightbox";
-// Додатковий імпорт стилів
 import "simplelightbox/dist/simple-lightbox.min.css";
 
 const URL = 'https://pixabay.com/api/'
@@ -69,7 +66,7 @@ async function getImages(text, page = 1) {
   }
   catch (error) {
     Notiflix.Notify.failure('Something went wrong. Please try again.')
-          console.log(error)
+          console.log(error.message)
             return;
   }
 }
@@ -125,7 +122,7 @@ async function getNextImages(text, page) {
 
   } catch (error) {
     Notiflix.Notify.failure('Sorry, there are no images matching your search query. Please try again.')
-    console.log(error);
+    console.log(error).message;
   }
 }
 
